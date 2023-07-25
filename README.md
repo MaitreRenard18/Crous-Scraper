@@ -9,10 +9,7 @@ Crous scraper est un bot discord utilisant discord.py qui envoie un message en m
 3. Configurez les clés d'API Discord `main.py` en modifiant la variable `BOT_TOKEN`.
 
 ## Utilisation
-Pour le faire marcher il suffit d'envoyer:
-```
-  >start [URL de la recherche Crous]
-```
+Pour le faire marcher il suffit d'envoyer : `>start [URL de la recherche Crous]`
 
 Par exemple `>start https://trouverunlogement.lescrous.fr/tools/31/search`  
 Envera tout les logements du Crous disponible.  
