@@ -37,7 +37,7 @@ async def stop(ctx: commands.context.Context) -> None:
     scrap.cancel()
 
 
-@tasks.loop(seconds=10)
+@tasks.loop(minutes=5)
 async def scrap(ctx: commands.context.Context, url: str) -> None:
     current_time = datetime.now().strftime("%H:%M")
 
