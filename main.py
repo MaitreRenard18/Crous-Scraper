@@ -41,20 +41,18 @@ async def stop(ctx: commands.context.Context) -> None:
 async def scrap(ctx: commands.context.Context, url: str) -> None:
     current_time = datetime.now().strftime("%H:%M")
 
-    names = []
-    for page in range(5):
-        response = requests.get(f"{url}?page={page}")
+    response = requests.get(url)
 
-        if response.status_code != 200:
-            embed = discord.Embed(title="Erreur lors du téléchargement de la page", color=0xc20000)
-            await ctx.author.send(embed=embed)
-            scrap.cancel()
-            return
+    if response.status_code != 200:
+        embed = discord.Embed(title="Erreur lors du téléchargement de la page", color=0xc20000)
+        await ctx.author.send(embed=embed)
+        scrap.cancel()
+        return
 
-        html_content = response.text
-        soup = BeautifulSoup(html_content, "html.parser")
-        elements = soup.find_all("li", class_="fr-col-12 fr-col-sm-6 fr-col-md-4 svelte-11sc5my fr-col-lg-4")
-        names += sorted([element.find("a").text for element in elements])
+    html_content = response.text
+    soup = BeautifulSoup(html_content, "html.parser")
+    elements = soup.find_all("li", class_="fr-col-12 fr-col-sm-6 fr-col-md-4 svelte-11sc5my fr-col-lg-4")
+    names = sorted([element.find("a").text for element in elements])
 
     names = list(set(names) - set(bot.prev_result))
 
