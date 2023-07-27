@@ -56,6 +56,7 @@ async def scrap(ctx: commands.context.Context, url: str) -> None:
 
     if len(names) == 0:
         print(f"[{current_time}] Aucun logement trouvé.")
+        bot.prev_result = names
         return
 
     names = list(set(names) - set(bot.prev_result))
