@@ -54,10 +54,14 @@ async def scrap(ctx: commands.context.Context, url: str) -> None:
     elements = soup.find_all("li", class_="fr-col-12 fr-col-sm-6 fr-col-md-4 svelte-11sc5my fr-col-lg-4")
     names = sorted([element.find("a").text for element in elements])
 
+    if len(names) == 0:
+        print(f"[{current_time}] Aucun logement trouvé.")
+        return
+
     names = list(set(names) - set(bot.prev_result))
 
     if len(names) == 0:
-        print(f"[{current_time}] Aucun logement trouvé.")
+        print(f"[{current_time}] Aucun nouveau logement trouvé.")
         return
 
     bot.prev_result = names
