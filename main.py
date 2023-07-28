@@ -11,65 +11,87 @@ bot = commands.Bot(command_prefix=">", intents=intents)
 
 BOT_TOKEN = ""
 
-bot.prev_result = []
+prev_results = {}
+started_tasks = {}
 
 
 @bot.event
 async def on_ready() -> None:
-    print("Bot is now online.")
+    current_time = datetime.now().strftime("%H:%M")
+    print(f"[{current_time}] Bot en ligne.")
 
 
 @bot.command(name="start")
 async def start(ctx: commands.context.Context, arg: str = None) -> None:
+    if ctx.author.id in started_tasks:
+        embed = discord.Embed(title="Recherche déjà en cours.", color=0xc20000)
+        await ctx.channel.send(embed=embed)
+        return
+
     if arg is None:
         embed = discord.Embed(title="Aucune URL entrée.", color=0xc20000)
         await ctx.channel.send(embed=embed)
-    else:
-        embed = discord.Embed(title="Recherche commencée.", color=0x0f8000)
-        await ctx.channel.send(embed=embed)
-        scrap.start(ctx, arg)
+        return
+
+    task = tasks.loop(minutes=1)(scrap)
+    task.start(ctx, arg)
+    started_tasks[ctx.author.id] = task
+    prev_results[ctx.author.id] = set()
+
+    current_time = datetime.now().strftime("%H:%M")
+    print(f"[{current_time}] Recherche commencée.")
+    embed = discord.Embed(title="Recherche commencée.", color=0x0f8000)
+    await ctx.channel.send(embed=embed)
 
 
 @bot.command(name="stop")
 async def stop(ctx: commands.context.Context) -> None:
+    if ctx.author.id not in started_tasks:
+        embed = discord.Embed(title="Aucune recherche en cours.", color=0xc20000)
+        await ctx.channel.send(embed=embed)
+        return
+
+    started_tasks[ctx.author.id].cancel()
+    del started_tasks[ctx.author.id]
+    del prev_results[ctx.author.id]
+
+    current_time = datetime.now().strftime("%H:%M")
+    print(f"[{current_time}] Recherche arrêtée.")
     embed = discord.Embed(title="Recherche arrêtée.", color=0xc20000)
     await ctx.channel.send(embed=embed)
-    scrap.cancel()
 
 
-@tasks.loop(minutes=5)
 async def scrap(ctx: commands.context.Context, url: str) -> None:
     current_time = datetime.now().strftime("%H:%M")
 
     response = requests.get(url)
 
     if response.status_code != 200:
-        embed = discord.Embed(title="Erreur lors du téléchargement de la page", color=0xc20000)
+        print(f"[{current_time}] Erreur lors du téléchargement de la page.")
+        embed = discord.Embed(title="Erreur lors du téléchargement de la page.", color=0xc20000)
         await ctx.author.send(embed=embed)
-        scrap.cancel()
         return
 
     html_content = response.text
     soup = BeautifulSoup(html_content, "html.parser")
     elements = soup.find_all("li", class_="fr-col-12 fr-col-sm-6 fr-col-md-4 svelte-11sc5my fr-col-lg-4")
-    names = sorted([element.find("a").text for element in elements])
+    names = {element.find("a").text for element in elements}
 
     if len(names) == 0:
         print(f"[{current_time}] Aucun logement trouvé.")
-        bot.prev_result = names
+        prev_results[ctx.author.id] = names
         return
 
-    names = list(set(names) - set(bot.prev_result))
+    names = names - prev_results[ctx.author.id]
 
     if len(names) == 0:
         print(f"[{current_time}] Aucun nouveau logement trouvé.")
         return
 
-    bot.prev_result = names
+    prev_results[ctx.author.id] = names
 
-    print(f"[{current_time}] Logements trouvés ({len(names)}):")
+    print(f"[{current_time}] Logement.s trouvé.s ({len(names)}):")
     print("-" + "\n-".join(names))
-
     embed = discord.Embed(title=f"Logement.s trouvé.s ({len(names)}):",
                           description="-" + "\n-".join(names),
                           color=0x0f8000)
