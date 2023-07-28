@@ -5,8 +5,7 @@ Crous-Scraper est un bot Discord utilisant discord.py qui envoie un message en M
 
 ## Installation
 1. Clonez ce dépôt sur votre machine.
-2. Configurez les clés d'API Discord `main.py` en modifiant la variable `BOT_TOKEN`.
-3. Exécutez `run.bat` pour démarrer le bot.
+2. Exécutez `run.bat`, entrez vos clés d'API Discord et le bot démarrera.
 
 ## Utilisation
 Pour le faire marcher il suffit d'envoyer : `>start [URL de la recherche Crous]`
