@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 
 from bs4 import BeautifulSoup
 from discord.ext import tasks, commands
@@ -9,7 +10,7 @@ import discord
 intents = discord.Intents(messages=True, message_content=True)
 bot = commands.Bot(command_prefix=">", intents=intents)
 
-BOT_TOKEN = ""
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 prev_results = {}
 started_tasks = {}
