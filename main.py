@@ -6,7 +6,7 @@ from discord.ext import tasks, commands
 import requests
 import discord
 
-
+print(discord.__version__)
 intents = discord.Intents(messages=True, message_content=True)
 bot = commands.Bot(command_prefix=">", intents=intents)
 
