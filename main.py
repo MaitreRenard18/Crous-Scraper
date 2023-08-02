@@ -1,5 +1,5 @@
 from datetime import datetime
-import os
+from os import getenv
 
 from bs4 import BeautifulSoup
 from discord.ext import tasks, commands
@@ -10,7 +10,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=">", intents=intents)
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+BOT_TOKEN = getenv("BOT_TOKEN")
 
 prev_results = {}
 started_tasks = {}
@@ -75,7 +75,7 @@ async def scrap(ctx: commands.context.Context, url: str) -> None:
 
     html_content = response.text
     soup = BeautifulSoup(html_content, "html.parser")
-    elements = soup.find_all("li", class_="fr-col-12 fr-col-sm-6 fr-col-md-4 svelte-11sc5my fr-col-lg-4")
+    elements = soup.find_all("div", class_="fr-card svelte-12dfls6")
     names = {element.find("a").text for element in elements}
 
     if len(names) == 0:
