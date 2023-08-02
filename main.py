@@ -6,7 +6,8 @@ from discord.ext import tasks, commands
 import requests
 import discord
 
-intents = discord.Intents(messages=True, message_content=True)
+intents = discord.Intents.default()
+intents.message_content = True
 bot = commands.Bot(command_prefix=">", intents=intents)
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
